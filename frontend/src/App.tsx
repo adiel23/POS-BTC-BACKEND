@@ -1,4 +1,3 @@
-import React from 'react';
 import NostrLogin from './components/NostrLogin';
 
 /**
@@ -13,3 +12,4 @@ function App() {
 }
 
 export default App;
+

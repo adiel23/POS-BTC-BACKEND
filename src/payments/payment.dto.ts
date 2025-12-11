@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 import {Invoice} from "@getalby/lightning-tools";
 
 export class MakePaymentDTO {
@@ -6,9 +6,8 @@ export class MakePaymentDTO {
     @IsNotEmpty()
     NWCUrl: string
 
-    @IsString()
-    @IsNotEmpty()
-    invoice: string
+    @IsNumber()
+    amount: number
 }
 
 export type MakePaymentResponse = {

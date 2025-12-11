@@ -1,0 +1,16 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Merchant {
+  pubkey String @id
+  lightningAddress String @unique @map("lightning_address")
+  name String
+  @@map("merchants")
+}

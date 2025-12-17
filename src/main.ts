@@ -19,6 +19,15 @@ async function bootstrap() {
       .setTitle('POS BTC API')
       .setDescription('POS BTC API description')
       .setVersion('1.0')
+      .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        in: 'header',
+      },
+      'access-token', // nombre del esquema
+      )
       .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api-docs', app, document);

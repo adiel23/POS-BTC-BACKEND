@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
+import { MerchantsModule } from 'src/merchants/merchants.module';
 
 /**
  * Módulo de autenticación basado en Nostr
@@ -24,6 +25,7 @@ import { JwtStrategy } from './jwt.strategy';
                 },
             }),
         }),
+        MerchantsModule
     ],
     controllers: [AuthController],
     providers: [AuthService, JwtStrategy],

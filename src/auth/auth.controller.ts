@@ -18,6 +18,8 @@ import {
 import { AuthService } from './auth.service';
 import { NostrLoginDto, AuthResponseDto } from './dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import type { AuthRequest } from 'src/types/auth.types';
+import { MerchantsService } from 'src/merchants/merchants.service';
 
 /**
  * Controlador de autenticación
@@ -26,7 +28,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService, private readonly merchantsService: MerchantsService) {}
 
   /**
    * POST /auth/login
@@ -68,7 +70,7 @@ export class AuthController {
    */
   @Get('profile')
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @ApiBearerAuth("access-token")
   @ApiOperation({
     summary: 'Get current user profile',
     description:
@@ -79,9 +81,9 @@ export class AuthController {
     description: 'Profile retrieved successfully',
     schema: {
       example: {
-        message: 'Autenticación exitosa',
-        user: { pubkey: 'npub...', userId: 'uuid' },
-        timestamp: 1620000000,
+        pubkey: 'npub...',
+        lightningAddress: 'empresa@lightning.com',
+        name: 'Pollo Campero'
       },
     },
   })
@@ -89,11 +91,17 @@ export class AuthController {
     status: 401,
     description: 'Unauthorized - Invalid or missing JWT',
   })
-  getProfile(@Request() req) {
+  @ApiResponse({
+    status: 404,
+    description: 'Not Found - Merchant not found',
+  })
+  async getProfile(@Request() req: AuthRequest) {
+    const {pubkey, lightningAddress, name} = await this.merchantsService.findByPubkey(req.user.pubkey);
+
     return {
-      message: 'Autenticación exitosa',
-      user: req.user,
-      timestamp: Math.floor(Date.now() / 1000),
+      pubkey,
+      lightningAddress,
+      name
     };
   }
 
@@ -107,7 +115,7 @@ export class AuthController {
   @ApiOperation({
     summary: 'Verify JWT token validity',
     description:
-      'Checks if the provided JWT token is valid and active without returning full profile data.',
+      'Checks if the provided JWT token is valid and active without returning full profile data.'
   })
   @ApiResponse({
     status: 200,
@@ -116,7 +124,7 @@ export class AuthController {
   })
   @ApiResponse({ status: 401, description: 'Token is invalid or expired' })
   @HttpCode(HttpStatus.OK)
-  verifyToken(@Request() req) {
+  verifyToken(@Request() req: AuthRequest) {
     return {
       valid: true,
       pubkey: req.user.pubkey,
